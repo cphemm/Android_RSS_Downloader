@@ -8,9 +8,6 @@ import org.xmlpull.v1.XmlPullParserFactory;
 import java.io.StringReader;
 import java.util.ArrayList;
 
-/**
- * Created by carolynhemmings on 4/10/16.
- */
 public class ParseApplications {
     private String xmlData;
     private ArrayList<Application> applications;
@@ -64,7 +61,7 @@ public class ParseApplications {
                         }
                         break;
                     default:
-                        //Nothing else to do.
+
                 }
                 eventType = xpp.next();
             }
