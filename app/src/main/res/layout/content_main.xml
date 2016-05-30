@@ -16,7 +16,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/ParseXMLFile"
-        android:id="@+id/btnParse"
+        android:id="@+id/parseButton"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
@@ -25,8 +25,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/xmlListView"
-        android:layout_below="@+id/btnParse"
-        android:layout_alignParentRight="@id/btnParse"
+        android:layout_below="@+id/parseButton"
+        android:layout_alignParentRight="@id/parseButton"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="false" />
