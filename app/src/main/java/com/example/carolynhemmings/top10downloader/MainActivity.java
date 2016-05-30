@@ -23,7 +23,7 @@ import java.net.URL;
 public class MainActivity extends AppCompatActivity {
 
     private String mFileContents;
-    private Button btnParse;
+    private Button parseButton;
     private ListView listApps;
 
     @Override
@@ -33,16 +33,14 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //create references to views
-        btnParse = (Button) findViewById(R.id.btnParse);
+        parseButton = (Button) findViewById(R.id.parseButton);
         listApps = (ListView) findViewById(R.id.xmlListView);
 
-        //add onClickListener
-        btnParse.setOnClickListener(new View.OnClickListener() {
+        parseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ParseApplications parseApplications = new ParseApplications(mFileContents);
-                //start the process
+
                 parseApplications.process();
                 ArrayAdapter<Application> arrayAdapter = new ArrayAdapter<Application>(
                         MainActivity.this, R.layout.list_item, parseApplications.getApplications());
@@ -50,11 +48,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //create an instance of downloadData class
         DownloadData downloadData = new DownloadData();
 
-        //put in url for RSS feed
-        downloadData.execute("http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/topfreeapplications/limit=10/xml");
+        downloadData.execute("http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/topMovies/xml");
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -64,6 +60,60 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+    }
+
+    private class DownloadData extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            mFileContents = downloadXMLFile(params[0]);
+            if(mFileContents == null) {
+                Log.d("DownloadData", "Error downloading");
+            }
+            return mFileContents;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            Log.d("DownloadData", "Result was: " + result);
+
+        }
+
+        private String downloadXMLFile(String urlPath) {
+            StringBuilder tempBuffer = new StringBuilder();
+
+            try {
+                URL url = new URL(urlPath);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                int response = connection.getResponseCode();
+                Log.d("DownloadData", "The response code was " + response);
+
+                InputStream is = connection.getInputStream();
+                InputStreamReader isr = new InputStreamReader(is);
+
+                int charRead;
+                char[] inputBuffer = new char[500];
+
+                while(true) {
+                    charRead = isr.read(inputBuffer);
+                    if(charRead <= 0) {
+                        break;
+                    }
+                    tempBuffer.append(String.copyValueOf(inputBuffer, 0, charRead));
+                }
+                return tempBuffer.toString();
+            } catch(IOException e) {
+                Log.d("DownloadData", "IO Exception reading data: " + e.getMessage());
+                e.printStackTrace();
+            } catch(SecurityException e) {
+                Log.d("DownloadData", "Security exception. Needs permission? " + e.getMessage());
+            }
+
+
+            return null;
+        }
+
     }
 
     @Override
@@ -88,88 +138,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private class DownloadData extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... params) {
-            mFileContents = downloadXMLFile(params[0]);
-            if(mFileContents == null) {
-                Log.d("DownloadData", "Error downloading");
-            }
-            return mFileContents;
-        }
-
-        //after doInBackground is completed onPostExecute automatically runs
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            Log.d("DownloadData", "Result was: " + result);
-
-        }
-
-        private String downloadXMLFile(String urlPath) {
-            //now create a temporary buffer used to store contents of XML file
-            //Stringbuilder is a more efficient way of building a string
-            StringBuilder tempBuffer = new StringBuilder();
-
-            //use try-catch block to capture any errors, example internet goes offline or
-            //you disconnect from power source
-            //if you don't handle the errors then program will crash
-            try {
-                //try opening the file first
-                URL url = new URL(urlPath);
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                int response = connection.getResponseCode();
-                Log.d("DownloadData", "The response code was " + response);
-
-                //use next two lines so you can begin reading data
-                InputStream is = connection.getInputStream();
-                InputStreamReader isr = new InputStreamReader(is);
-
-                //Download the data
-                int charRead;
-                //create temporary buffer. It reads the file 500 bytes at a time
-                char[] inputBuffer = new char[500];
-                //create loop to continually read from the file - keeps reading file until bytes are zero
-                while(true) {
-                    charRead = isr.read(inputBuffer);
-                    if(charRead <= 0) {
-                        break;
-                    }
-                    //if it gets to this line then it has more characters to read
-                    //store the characters that have been read from inputBuffer - append them to tempBuffer
-                    //convert input buffer to a string
-                    tempBuffer.append(String.copyValueOf(inputBuffer, 0, charRead));
-                }
-                return tempBuffer.toString();
-            } catch(IOException e) {
-                //e.getMessage simply provides more detail about the error
-                Log.d("DownloadData", "IO Exception reading data: " + e.getMessage());
-                e.printStackTrace();
-            } catch(SecurityException e) {
-                Log.d("DownloadData", "Security exception. Needs permission? " + e.getMessage());
-            }
-
-
-            return null;
-        }
-
-    }
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
