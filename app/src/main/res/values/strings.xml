@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Top 10 Downloader</string>
+    <string name="app_name">Top 10 Movie List</string>
     <string name="action_settings">Settings</string>
-    <string name="ParseXMLFile">Parse XML File</string>
+    <string name="ParseXMLFile">Click To Get the Top 10 Movie List</string>
 </resources>
